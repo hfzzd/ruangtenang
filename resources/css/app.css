@@ -1,0 +1,43 @@
+/* RuangTenang — custom style minimal.
+   Sebagian besar styling memakai utility Tailwind langsung di Blade. */
+
+:root {
+    --tenang: #548d79;
+    --tenang-soft: #e1efe8;
+}
+
+/* Font fallback yang rapi bila Inter belum termuat */
+body {
+    font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
+}
+
+/* Latar gradien lembut khas halaman RuangTenang */
+.bg-ruang-tenang {
+    background: linear-gradient(180deg, #f3f8f5 0%, #eef5f2 40%, #f7faf8 100%);
+}
+
+/* Badge "segera" untuk fitur yang belum tersedia */
+.badge-segera {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: var(--tenang-soft);
+    color: var(--tenang);
+}
+
+/* Animasi halus untuk kartu/konten yang muncul */
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.konten-masuk {
+    animation: fadeSlideIn 0.25s ease-out;
+}
+
+/* Bar grafik mood — transisi lembut saat data dimuat */
+.bar-mood {
+    transition: height 0.5s ease-out;
+}
