@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\PsikologController;
 use Illuminate\Support\Facades\Route;
 
 // ---------------------------------------------------------------------------
@@ -21,3 +22,7 @@ Route::get('/forum/buat', [ForumController::class, 'create'])->name('forum.creat
 Route::post('/forum', [ForumController::class, 'store'])->name('forum.store');
 Route::get('/forum/{id}', [ForumController::class, 'show'])->name('forum.show')->whereNumber('id');
 Route::post('/forum/{id}/balas', [ForumController::class, 'storeReply'])->name('forum.reply')->whereNumber('id');
+
+// === Day-2: Direktori Psikolog ===
+Route::get('/psikolog', [PsikologController::class, 'index'])->name('psikolog.index');
+Route::get('/psikolog/{id}', [PsikologController::class, 'show'])->name('psikolog.show');
