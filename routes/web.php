@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\PsikologController;
+use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 
 // ---------------------------------------------------------------------------
@@ -26,3 +27,9 @@ Route::post('/forum/{id}/balas', [ForumController::class, 'storeReply'])->name('
 // === Day-2: Direktori Psikolog ===
 Route::get('/psikolog', [PsikologController::class, 'index'])->name('psikolog.index');
 Route::get('/psikolog/{id}', [PsikologController::class, 'show'])->name('psikolog.show');
+
+// === Day-2: Booking ===
+Route::get('/booking', [BookingController::class, 'index'])->name('booking.index');
+Route::get('/booking/buat', [BookingController::class, 'create'])->name('booking.create');
+Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
