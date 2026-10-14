@@ -83,9 +83,32 @@
             <p class="mt-5 rounded-xl bg-tenang-50 border border-tenang-200 px-4 py-3 text-sm text-tenang-800">
                 Jadwalmu sudah <strong>dikonfirmasi</strong>. Datanglah beberapa menit lebih awal dan bawa dirimu yang apa adanya. Kami menunggumu. 💚
             </p>
+        @endif
+
+        @if (in_array($booking->status, ['pending', 'confirmed']))
+            <div class="mt-6 rounded-2xl border border-tenang-200 bg-tenang-50/60 p-5">
+                <h2 class="font-bold text-slate-900">Kelola Booking 💫</h2>
+                <p class="mt-1 text-sm text-slate-600">
+                    Kamu bisa mengubah jadwal atau membatalkan booking ini selama statusnya masih menunggu konfirmasi atau sudah dikonfirmasi.
+                    Santai aja, tidak ada biaya pembatalan — yang penting kamu nyaman.
+                </p>
+                <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                    <a href="{{ route('booking.editSchedule', $booking->id) }}"
+                       class="rounded-xl bg-tenang-600 px-6 py-2.5 text-center font-semibold text-white shadow hover:bg-tenang-700 transition">
+                        Ubah Jadwal
+                    </a>
+                    <form method="POST" action="{{ route('booking.cancel', $booking->id) }}">
+                        @csrf
+                        <button type="submit" onclick="return confirm('Yakin ingin membatalkan booking ini?')"
+                                class="w-full sm:w-auto rounded-xl border border-rose-300 bg-rose-50 px-6 py-2.5 font-semibold text-rose-700 hover:bg-rose-100 transition">
+                            Batalkan Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
         @elseif ($booking->status === 'cancelled')
-            <p class="mt-5 rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 text-sm text-rose-800">
-                Booking ini <strong>dibatalkan</strong>. Tidak apa-apa — kamu bisa membuat booking baru kapan pun kamu siap.
+            <p class="mt-6 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">
+                Booking ini sudah dibatalkan. Tenang aja — kamu bisa membuat booking baru kapan pun kamu siap. 🌱
             </p>
         @endif
 
