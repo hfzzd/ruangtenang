@@ -48,6 +48,7 @@
             </a>
             <div class="hidden sm:flex items-center gap-1 text-sm font-medium">
                 <a href="{{ url('/') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Beranda</a>
+                <a href="{{ url('/artikel') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Artikel</a>
                 <a href="{{ url('/jurnal') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Jurnal</a>
                 <a href="{{ url('/mood') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Mood</a>
                 <a href="{{ url('/psikolog') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Psikolog</a>
@@ -83,6 +84,7 @@
         {{-- Menu mobile --}}
         <div data-menu-mobile class="hidden sm:hidden border-t border-tenang-100 px-4 py-2 text-sm font-medium">
             <a href="{{ url('/') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Beranda</a>
+            <a href="{{ url('/artikel') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Artikel</a>
             <a href="{{ url('/jurnal') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Jurnal</a>
             <a href="{{ url('/mood') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Mood</a>
             <a href="{{ url('/psikolog') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Psikolog</a>
