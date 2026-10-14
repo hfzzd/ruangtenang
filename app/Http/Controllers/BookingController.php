@@ -147,4 +147,84 @@ class BookingController extends Controller
 
         return view('booking.show', ['booking' => $booking]);
     }
+
+    /**
+     * Batalkan booking. Hanya boleh untuk status 'pending'/'confirmed'.
+     * Booking yang sudah completed/cancelled tidak bisa diubah lagi.
+     */
+    public function cancel(int $id): RedirectResponse
+    {
+        $booking = Booking::findOrFail($id);
+
+        if (! $this->isCancellable($booking)) {
+            return back()->with('galat', 'Booking ini sudah tidak bisa dibatalkan lagi.');
+        }
+
+        $booking->status = 'cancelled';
+        $booking->save();
+
+        return redirect()
+            ->route('booking.show', $booking->id)
+            ->with('sukses', 'Booking berhasil dibatalkan. Jaga dirimu baik-baik ya 🌱');
+    }
+
+    /**
+     * Form ubah jadwal booking. Hanya boleh untuk status
+     * 'pending'/'confirmed' dan jadwal yang masih di masa depan.
+     */
+    public function editSchedule(int $id): View|RedirectResponse
+    {
+        $booking = Booking::with('professional')->findOrFail($id);
+
+        if (! $this->isReschedulable($booking)) {
+            return back()->with('galat', 'Jadwal booking ini sudah tidak bisa diubah lagi.');
+        }
+
+        return view('booking.edit-schedule', ['booking' => $booking]);
+    }
+
+    /**
+     * Simpan perubahan jadwal booking.
+     */
+    public function updateSchedule(Request $request, int $id): RedirectResponse
+    {
+        $data = $request->validate([
+            'scheduled_at'     => 'required|date|after:today',
+            'duration_minutes' => 'required|integer|in:30,45,60,90',
+        ]);
+
+        $booking = Booking::findOrFail($id);
+
+        if (! $this->isReschedulable($booking)) {
+            return back()->with('galat', 'Jadwal booking ini sudah tidak bisa diubah lagi.');
+        }
+
+        // Hanya dua kolom tervalidasi yang diupdate (ecc-laravel-security:
+        // tidak ada mass assignment dari input mentah).
+        $booking->update($data);
+
+        return redirect()
+            ->route('booking.show', $booking->id)
+            ->with('sukses', 'Jadwal booking berhasil diubah 🌱');
+    }
+
+    /**
+     * Guard: booking bisa dibatalkan hanya jika statusnya
+     * 'pending' atau 'confirmed'.
+     */
+    private function isCancellable(Booking $booking): bool
+    {
+        return in_array($booking->status, ['pending', 'confirmed'], true);
+    }
+
+    /**
+     * Guard: jadwal booking bisa diubah hanya jika statusnya
+     * 'pending'/'confirmed' DAN scheduled_at masih di masa depan.
+     */
+    private function isReschedulable(Booking $booking): bool
+    {
+        return $this->isCancellable($booking)
+            && $booking->scheduled_at !== null
+            && $booking->scheduled_at->isFuture();
+    }
 }
