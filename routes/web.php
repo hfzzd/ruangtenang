@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\PsikologController;
 use App\Http\Controllers\BookingController;
@@ -33,3 +34,12 @@ Route::get('/booking', [BookingController::class, 'index'])->name('booking.index
 Route::get('/booking/buat', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.show');
+
+// === Day-3: Artikel ===
+Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel.index');
+Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel.show');
+
+// === Day-3: Aksi booking ===
+Route::post('/booking/{id}/batal', [BookingController::class, 'cancel'])->name('booking.cancel')->whereNumber('id');
+Route::get('/booking/{id}/ubah-jadwal', [BookingController::class, 'editSchedule'])->name('booking.editSchedule')->whereNumber('id');
+Route::patch('/booking/{id}/ubah-jadwal', [BookingController::class, 'updateSchedule'])->name('booking.updateSchedule')->whereNumber('id');
