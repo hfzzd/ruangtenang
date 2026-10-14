@@ -10,7 +10,7 @@
 
 ## Apa itu RuangTenang?
 
-RuangTenang adalah platform kesehatan mental berbahasa Indonesia: jurnal terpandu, pelacakan mood harian, direktori psikolog, dan artikel edukasi — semuanya dalam satu aplikasi web yang hangat dan ramah.
+RuangTenang adalah platform kesehatan mental berbahasa Indonesia: jurnal terpandu, pelacakan mood harian, direktori psikolog, forum komunitas, dan artikel edukasi — semuanya dalam satu aplikasi web yang hangat dan ramah. Dibangun dengan cinta, untuk siapa saja yang ingin merawat dirinya sendiri. 💛
 
 ### 💯 Self-Hosted — Data Kamu Tetap di Mesinmu Sendiri
 
@@ -24,18 +24,23 @@ Tidak ada akun cloud yang wajib dibuat, tidak ada data jurnal yang dikirim ke pi
 
 ## Fitur
 
-### ✅ MVP (Day-1)
-- **📝 Jurnal Terpandu** — tulis curahan hati dengan pertanyaan panduan yang membantu refleksi
-- **😊 Mood Tracking** — catat suasana hatimu setiap hari dan lihat polanya dari waktu ke waktu
+### ✅ Day-1 — Fondasi
+- **📝 Jurnal Terpandu** — tulis curahan hati dengan pertanyaan panduan berbahasa Indonesia yang membantu refleksi
+- **😊 Mood Tracking** — catat suasana hatimu setiap hari dan lihat polanya dari waktu ke waktu lewat dashboard
+- **🔌 API** — endpoint REST untuk jurnal & mood dengan autentikasi Sanctum (siap untuk aplikasi mobile)
 
-### 🚧 Segera Hadir
-- **🧑‍⚕️ Direktori Psikolog** — temukan psikolog yang tepat untukmu
-- **📅 Booking Sesi** — jadwalkan sesi konseling langsung dari aplikasi
-- **📚 Artikel Edukasi** — bacaan kesehatan mental berbahasa Indonesia yang terkurasi
+### ✅ Day-2 — Komunitas & Layanan
+- **💬 Forum Komunitas** — buat thread, balas, dan saling menguatkan dalam ruang yang aman
+- **🧑‍⚕️ Direktori Psikolog** — temukan psikolog yang tepat dengan pencarian nama, spesialisasi, dan kota
+- **📅 Booking Sesi** — jadwalkan sesi konseling langsung dari aplikasi, lengkap dengan status booking
+
+### 🚧 Day-3 — Sedang Dikerjakan
+- **📚 Halaman Artikel** — bacaan kesehatan mental berbahasa Indonesia yang terkurasi (datanya sudah ada, tampilannya menyusul)
+- **🔄 Kelola Booking** — batalkan atau ubah jadwal sesi yang sudah dipesan
 
 ## Cara Menjalankan (Cepat)
 
-Prasyarat: [Docker Desktop](https://www.docker.com/products/docker-desktop/) terinstal.
+Prasyarat: [Docker Desktop](https://www.docker.com/products/docker-desktop/) terinstal dan berjalan.
 
 ```bash
 git clone https://github.com/hfzzd/ruangtenang.git
@@ -46,11 +51,37 @@ docker compose up -d --build
 # Siapkan aplikasi (sekali saja, saat pertama kali)
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate
+
+# Opsional: isi data contoh (psikolog & artikel)
+docker compose exec app php artisan db:seed
 ```
 
 Lalu buka **http://localhost:8000** di browser. 🌿
 
-> Panduan lengkap (termasuk cara manual tanpa Docker dan troubleshooting) ada di [docs/INSTALASI.md](docs/INSTALASI.md).
+> `key:generate` wajib dijalankan sekali — tanpa `APP_KEY`, Laravel tidak bisa mengenkripsi sesi. Kalau database belum siap saat `migrate` pertama kali, tunggu ~20 detik lalu ulangi.
+>
+> Panduan lengkap (termasuk cara manual tanpa Docker dan troubleshooting) ada di [docs/INSTALASI.md](docs/INSTALASI.md). Gambaran arsitekturnya ada di [docs/arsitektur.md](docs/arsitektur.md).
+
+## Struktur Proyek
+
+```
+ruangtenang/
+├── app/
+│   ├── Http/Controllers/        # ForumController, PsikologController,
+│   │   └── Api/                 #   BookingController + API (Auth, Journal, Mood)
+│   └── Models/                  # JournalEntry, MoodEntry, ForumThread,
+│                                #   ForumReply, Professional, Booking, Article
+├── routes/
+│   ├── web.php                  # Halaman web (Blade)
+│   └── api.php                  # Endpoint API (Sanctum)
+├── resources/views/             # Blade: layouts, pages, forum, psikolog, booking
+├── database/
+│   ├── migrations/              # Skema tabel
+│   └── seeders/                 # Data contoh psikolog & artikel
+├── docs/                        # INSTALASI.md, arsitektur.md
+├── Dockerfile                   # Image aplikasi (PHP 8.2 + Laravel)
+└── docker-compose.yml           # Orkestrasi: app (Laravel) + db (MySQL 8)
+```
 
 ## Teknologi
 
