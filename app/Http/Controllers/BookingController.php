@@ -26,6 +26,10 @@ use Illuminate\View\View;
  *    (tidak ada $request->all() / mass assignment dari input mentah).
  *  - Blade auto-escape semua output user ({{ }}), tidak ada {!! !!} untuk
  *    data input pengguna.
+ *  - Proteksi kepemilikan (Day-4, pola ecc-laravel-security: pemilik =
+ *    user_id sama): detail booking hanya boleh dilihat pemilik yang
+ *    login atau pembuatnya via session; aksi batal/ubah jadwal hanya
+ *    untuk pemilik yang login.
  *
  * Catatan: kata sandi acak dipakai saat membuat User baru karena kolom
  * password NOT NULL; akun ini dimaksudkan dikelola saat auth web
@@ -103,6 +107,10 @@ class BookingController extends Controller
             'price'            => $price,
         ]);
 
+        // Catat ID booking di session agar pembuatnya bisa langsung
+        // melihat detail tanpa login dulu (dihapus saat logout/session habis).
+        $request->session()->push('booking_baru', $booking->id);
+
         return redirect()
             ->route('booking.show', $booking->id)
             ->with('sukses', 'Booking berhasil dibuat. Kami akan menghubungimu untuk konfirmasi jadwal. 🌱');
@@ -139,11 +147,16 @@ class BookingController extends Controller
     }
 
     /**
-     * Detail satu booking.
+     * Detail satu booking. Terproteksi kepemilikan: hanya pemilik yang
+     * login atau pembuat via session yang boleh melihat.
      */
-    public function show(int $id): View
+    public function show(Request $request, int $id): View|RedirectResponse
     {
         $booking = Booking::with(['professional', 'user'])->findOrFail($id);
+
+        if (! $this->bolehKelola($booking, $request)) {
+            return redirect()->route('masuk')->with('galat', 'Silakan masuk untuk melihat booking ini.');
+        }
 
         return view('booking.show', ['booking' => $booking]);
     }
@@ -155,6 +168,12 @@ class BookingController extends Controller
     public function cancel(int $id): RedirectResponse
     {
         $booking = Booking::findOrFail($id);
+
+        // Hanya pemilik yang login boleh membatalkan (tamu diarahkan
+        // daftar/masuk dulu).
+        if (! (auth()->check() && $booking->user_id === auth()->id())) {
+            return redirect()->route('masuk')->with('galat', 'Silakan masuk untuk mengelola booking ini.');
+        }
 
         if (! $this->isCancellable($booking)) {
             return back()->with('galat', 'Booking ini sudah tidak bisa dibatalkan lagi.');
@@ -176,6 +195,11 @@ class BookingController extends Controller
     {
         $booking = Booking::with('professional')->findOrFail($id);
 
+        // Hanya pemilik yang login boleh mengubah jadwal.
+        if (! (auth()->check() && $booking->user_id === auth()->id())) {
+            return redirect()->route('masuk')->with('galat', 'Silakan masuk untuk mengelola booking ini.');
+        }
+
         if (! $this->isReschedulable($booking)) {
             return back()->with('galat', 'Jadwal booking ini sudah tidak bisa diubah lagi.');
         }
@@ -195,6 +219,11 @@ class BookingController extends Controller
 
         $booking = Booking::findOrFail($id);
 
+        // Hanya pemilik yang login boleh menyimpan perubahan jadwal.
+        if (! (auth()->check() && $booking->user_id === auth()->id())) {
+            return redirect()->route('masuk')->with('galat', 'Silakan masuk untuk mengelola booking ini.');
+        }
+
         if (! $this->isReschedulable($booking)) {
             return back()->with('galat', 'Jadwal booking ini sudah tidak bisa diubah lagi.');
         }
@@ -206,6 +235,24 @@ class BookingController extends Controller
         return redirect()
             ->route('booking.show', $booking->id)
             ->with('sukses', 'Jadwal booking berhasil diubah 🌱');
+    }
+
+    /**
+     * Cek kepemilikan booking (otorisasi level record, pola
+     * ecc-laravel-security: pemilik = user_id sama).
+     *
+     * Booking boleh dilihat jika:
+     *  - pengguna sudah login DAN booking miliknya, ATAU
+     *  - ID booking tercatat di session 'booking_baru' (baru dibuat
+     *    dari form booking di browser ini, sebelum login).
+     */
+    private function bolehKelola(Booking $booking, Request $request): bool
+    {
+        if (auth()->check() && $booking->user_id === auth()->id()) {
+            return true;
+        }
+
+        return in_array($booking->id, $request->session()->get('booking_baru', []), true);
     }
 
     /**
