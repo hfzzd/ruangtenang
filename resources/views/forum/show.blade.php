@@ -37,6 +37,48 @@
         <div class="mt-4 text-slate-700 leading-relaxed whitespace-pre-line">{{ $thread->body }}</div>
     </article>
 
+    {{-- ===== Laporkan thread ===== --}}
+    <details class="mt-4 rounded-2xl border border-tenang-100 bg-white/70 px-5 py-4 shadow-sm">
+        <summary class="cursor-pointer list-none text-sm font-medium text-slate-500 hover:text-tenang-700 transition flex items-center gap-2">
+            <span aria-hidden="true">🚩</span> Laporkan thread ini
+        </summary>
+        <form method="POST" action="{{ route('forum.report', $thread->id) }}" class="mt-4 space-y-4">
+            @csrf
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Kalau thread ini melanggar etiket komunitas, kasih tahu kami yaa. Laporanmu membantu menjaga forum tetap aman dan hangat 🌱
+            </p>
+            <div>
+                <label for="report_reason" class="block text-sm font-medium text-slate-700">Alasan laporan</label>
+                <select id="report_reason" name="reason" required
+                        class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-tenang-500 focus:ring-tenang-500 @error('reason') border-red-400 @enderror">
+                    <option value="" disabled {{ old('reason') ? '' : 'selected' }}>Pilih alasan…</option>
+                    <option value="Spam" {{ old('reason') === 'Spam' ? 'selected' : '' }}>Spam</option>
+                    <option value="Ujaran kebencian" {{ old('reason') === 'Ujaran kebencian' ? 'selected' : '' }}>Ujaran kebencian</option>
+                    <option value="Konten tidak pantas" {{ old('reason') === 'Konten tidak pantas' ? 'selected' : '' }}>Konten tidak pantas</option>
+                    <option value="Informasi menyesatkan" {{ old('reason') === 'Informasi menyesatkan' ? 'selected' : '' }}>Informasi menyesatkan</option>
+                    <option value="Lainnya" {{ old('reason') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                </select>
+                @error('reason')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label for="reporter_name" class="block text-sm font-medium text-slate-700">Nama <span class="font-normal text-slate-400">(opsional)</span></label>
+                <input id="reporter_name" name="reporter_name" type="text" maxlength="50"
+                       value="{{ old('reporter_name') }}"
+                       class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-tenang-500 focus:ring-tenang-500 @error('reporter_name') border-red-400 @enderror"
+                       placeholder="Boleh dikosongkan untuk anonim">
+                @error('reporter_name')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+            <button type="submit"
+                    class="rounded-xl border border-tenang-300 bg-tenang-50 px-5 py-2 text-sm font-semibold text-tenang-700 hover:bg-tenang-100 transition">
+                Kirim Laporan
+            </button>
+        </form>
+    </details>
+
     {{-- ===== Daftar balasan ===== --}}
     <section class="mt-8" aria-label="Balasan">
         <h2 class="font-bold text-slate-900">Balasan ({{ $thread->replies->count() }})</h2>
