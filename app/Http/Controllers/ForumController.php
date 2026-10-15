@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ForumReply;
+use App\Models\ForumReport;
 use App\Models\ForumThread;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -100,5 +101,73 @@ class ForumController extends Controller
         return redirect()
             ->route('forum.show', $thread->id)
             ->with('status', 'Balasan terkirim. Terima kasih sudah mendukung sesama 💚');
+    }
+
+    /**
+     * Simpan laporan terhadap sebuah thread forum.
+     */
+    public function report(Request $request, int $id): RedirectResponse
+    {
+        $thread = ForumThread::findOrFail($id);
+
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:300'],
+            'reporter_name' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        ForumReport::create([
+            'forum_thread_id' => $thread->id,
+            'reason' => $validated['reason'],
+            'reporter_name' => $validated['reporter_name'] ?? null,
+        ]);
+
+        return back()
+            ->with('sukses', 'Terima kasih atas laporanmu. Tim kami akan meninjaunya. 🌱');
+    }
+
+    /**
+     * Tampilkan daftar laporan thread forum untuk moderasi.
+     *
+     * CATATAN: rute admin ini masih "lunak" — belum ada role admin /
+     * middleware otorisasi, jadi siapa pun yang tahu URL-nya bisa membuka
+     * halaman ini. Ditandai untuk dikeraskan (middleware admin) di
+     * iterasi berikut.
+     */
+    public function reports(): View
+    {
+        $reports = ForumReport::with('thread')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('forum.laporan', [
+            'reports' => $reports,
+        ]);
+    }
+
+    /**
+     * Tindaklanjuti sebuah laporan: ubah statusnya, atau hapus thread
+     * yang dilaporkan (cascade menghapus semua laporan di thread itu).
+     */
+    public function resolveReport(Request $request, int $id): RedirectResponse
+    {
+        $report = ForumReport::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => ['required', 'string', Rule::in(['ditindak', 'ditolak'])],
+            'hapus_thread' => ['nullable', 'boolean'],
+        ]);
+
+        $thread = $report->thread;
+
+        if (($validated['hapus_thread'] ?? false) && $thread) {
+            // Hapus thread beserta seluruh laporan terkait (cascade).
+            $thread->delete();
+        } else {
+            $report->update(['status' => $validated['status']]);
+        }
+
+        return redirect()
+            ->route('admin.reports')
+            ->with('sukses', 'Laporan berhasil ditindaklanjuti. 🌱');
     }
 }
