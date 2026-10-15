@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\PsikologController;
 use App\Http\Controllers\BookingController;
@@ -14,7 +15,14 @@ use Illuminate\Support\Facades\Route;
 // ---------------------------------------------------------------------------
 
 Route::view('/', 'pages.beranda')->name('beranda');
-Route::view('/masuk', 'pages.masuk')->name('masuk');
+
+// === Day-4: Autentikasi web ===
+Route::get('/masuk', [AuthController::class, 'showLogin'])->name('masuk');
+Route::post('/masuk', [AuthController::class, 'login'])->name('auth.login');
+Route::post('/keluar', [AuthController::class, 'logout'])->name('auth.logout');
+Route::get('/daftar', [AuthController::class, 'showRegister'])->name('auth.register');
+Route::post('/daftar', [AuthController::class, 'register'])->name('auth.register.store');
+
 Route::view('/jurnal', 'pages.jurnal')->name('jurnal');
 Route::view('/mood', 'pages.mood')->name('mood');
 
@@ -24,6 +32,11 @@ Route::get('/forum/buat', [ForumController::class, 'create'])->name('forum.creat
 Route::post('/forum', [ForumController::class, 'store'])->name('forum.store');
 Route::get('/forum/{id}', [ForumController::class, 'show'])->name('forum.show')->whereNumber('id');
 Route::post('/forum/{id}/balas', [ForumController::class, 'storeReply'])->name('forum.reply')->whereNumber('id');
+
+// === Day-4: Pelaporan forum ===
+Route::post('/forum/{id}/laporkan', [ForumController::class, 'report'])->name('forum.report')->whereNumber('id');
+Route::get('/admin/laporan-forum', [ForumController::class, 'reports'])->name('admin.reports');
+Route::post('/admin/laporan-forum/{id}', [ForumController::class, 'resolveReport'])->name('admin.reports.resolve')->whereNumber('id');
 
 // === Day-2: Direktori Psikolog ===
 Route::get('/psikolog', [PsikologController::class, 'index'])->name('psikolog.index');
