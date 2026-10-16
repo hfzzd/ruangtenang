@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\PsikologController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // ---------------------------------------------------------------------------
@@ -56,3 +58,11 @@ Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel
 Route::post('/booking/{id}/batal', [BookingController::class, 'cancel'])->name('booking.cancel')->whereNumber('id');
 Route::get('/booking/{id}/ubah-jadwal', [BookingController::class, 'editSchedule'])->name('booking.editSchedule')->whereNumber('id');
 Route::patch('/booking/{id}/ubah-jadwal', [BookingController::class, 'updateSchedule'])->name('booking.updateSchedule')->whereNumber('id');
+
+// === Day-5: Profil & Dashboard (butuh login) ===
+Route::middleware('auth')->group(function () {
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profil.show');
+    Route::get('/profil/ubah', [ProfileController::class, 'edit'])->name('profil.edit');
+    Route::patch('/profil', [ProfileController::class, 'update'])->name('profil.update');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
