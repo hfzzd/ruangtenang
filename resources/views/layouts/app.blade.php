@@ -54,6 +54,17 @@
                 <a href="{{ url('/psikolog') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Psikolog</a>
                 <a href="{{ url('/booking') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Booking</a>
                 <a href="{{ url('/forum') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Forum</a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Dashboard</a>
+                    <a href="{{ route('profil.show') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Profil</a>
+                    <form method="POST" action="{{ route('auth.logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Keluar</button>
+                    </form>
+                @endauth
+                @guest
+                    <a href="{{ route('masuk') }}" class="rounded-lg bg-tenang-600 px-4 py-2 font-semibold text-white shadow hover:bg-tenang-700 transition">Masuk</a>
+                @endguest
             </div>
             <div class="flex items-center gap-2">
                 {{-- Status login ditangani Alpine: tampilkan tombol Masuk atau menu pengguna --}}
@@ -90,6 +101,17 @@
             <a href="{{ url('/psikolog') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Psikolog</a>
             <a href="{{ url('/booking') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Booking</a>
             <a href="{{ url('/forum') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Forum</a>
+            @auth
+                <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Dashboard</a>
+                <a href="{{ route('profil.show') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Profil</a>
+                <form method="POST" action="{{ route('auth.logout') }}">
+                    @csrf
+                    <button type="submit" class="block w-full text-left rounded-lg px-3 py-2 hover:bg-tenang-50">Keluar</button>
+                </form>
+            @endauth
+            @guest
+                <a href="{{ route('masuk') }}" class="mt-1 block rounded-lg bg-tenang-600 px-4 py-2 text-center font-semibold text-white shadow hover:bg-tenang-700 transition">Masuk</a>
+            @endguest
         </div>
     </header>
 
