@@ -57,6 +57,9 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Dashboard</a>
                     <a href="{{ route('profil.show') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Profil</a>
+                    @if(auth()->user()?->role === 'admin')
+                        <a href="{{ route('admin.reports') }}" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Laporan Forum</a>
+                    @endif
                     <form method="POST" action="{{ route('auth.logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="rounded-lg px-3 py-2 hover:bg-tenang-50">Keluar</button>
@@ -104,6 +107,9 @@
             @auth
                 <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Dashboard</a>
                 <a href="{{ route('profil.show') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Profil</a>
+                @if(auth()->user()?->role === 'admin')
+                    <a href="{{ route('admin.reports') }}" class="block rounded-lg px-3 py-2 hover:bg-tenang-50">Laporan Forum</a>
+                @endif
                 <form method="POST" action="{{ route('auth.logout') }}">
                     @csrf
                     <button type="submit" class="block w-full text-left rounded-lg px-3 py-2 hover:bg-tenang-50">Keluar</button>
