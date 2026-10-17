@@ -19,13 +19,16 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
+     * Catatan: 'role' sengaja TIDAK ada di daftar ini (defense in depth
+     * terhadap mass assignment). Untuk membuat admin lewat seeder/tinker:
+     *   $user->role = 'admin'; $user->save();
+     *
      * @var list<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
         'avatar',
         'bio',
     ];

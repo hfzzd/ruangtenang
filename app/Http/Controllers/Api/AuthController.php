@@ -32,7 +32,7 @@ class AuthController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
-            'role' => 'user',
+            // 'role' tidak di-mass-assign: DB default 'user', hindari MassAssignmentException.
         ]);
 
         $token = $user->createToken('ruangtenang')->plainTextToken;
