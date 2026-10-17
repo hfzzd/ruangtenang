@@ -37,8 +37,12 @@ Route::post('/forum/{id}/balas', [ForumController::class, 'storeReply'])->name('
 
 // === Day-4: Pelaporan forum ===
 Route::post('/forum/{id}/laporkan', [ForumController::class, 'report'])->name('forum.report')->whereNumber('id');
-Route::get('/admin/laporan-forum', [ForumController::class, 'reports'])->name('admin.reports');
-Route::post('/admin/laporan-forum/{id}', [ForumController::class, 'resolveReport'])->name('admin.reports.resolve')->whereNumber('id');
+
+// === Day-6: Rute admin (butuh login + role admin) ===
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/laporan-forum', [ForumController::class, 'reports'])->name('admin.reports');
+    Route::post('/admin/laporan-forum/{id}', [ForumController::class, 'resolveReport'])->name('admin.reports.resolve')->whereNumber('id');
+});
 
 // === Day-2: Direktori Psikolog ===
 Route::get('/psikolog', [PsikologController::class, 'index'])->name('psikolog.index');
